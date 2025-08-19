@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Massage Heights Membership Decision Tree</title>
+    <style>
+        body {
+            font-family: 'Playfair Display', 'Lato', 'Open Sans', sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+            padding: 40px;
+            background: #002D62; /* Dark Blue */
+            color: #F5F5DC; /* Beige */
+            border-radius: 20px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.2);
+            overflow-x: hidden;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1); /* Slight white overlay for contrast */
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        #logo {
+            max-width: 300px;
+            margin-bottom: 35px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            border: 2px solid #FFD700; /* Gold border */
+            border-radius: 10px;
+        }
+        #logo-note {
+            font-size: 14px;
+            color: #FFD700;
+            margin-top: 5px;
+        }
+        #nameInput {
+            margin-bottom: 30px;
+            padding: 15px;
+            font-size: 18px;
+            width: 100%;
+            max-width: 400px;
+            border: 3px solid #6A7BA2; /* Slate Blue */
+            border-radius: 10px;
+            background: #FFFFFF;
+            color: #002D62;
+            transition: border-color 0.3s ease;
+        }
+        #nameInput:focus {
+            border-color: #FFD700; /* Gold on focus */
+            outline: none;
+        }
+        #submitName {
+            padding: 15px 30px;
+            margin: 10px;
+            background: #FFD700; /* Gold */
+            color: #002D62; /* Dark Blue */
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            font-size: 18px;
+            transition: transform 0.2s ease, background 0.3s ease;
+        }
+        #submitName:hover {
+            transform: scale(1.05);
+            background: #CCA300; /* Darker Gold */
+        }
+        #question {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #F5F5DC; /* Beige */
+            text-align: center;
+            font-weight: 600;
+            animation: fadeIn 1s ease-in-out;
+        }
+        button {
+            padding: 15px 30px;
+            margin: 10px;
+            background: #FFD700; /* Gold */
+            color: #002D62; /* Dark Blue */
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            font-size: 18px;
+            transition: transform 0.2s ease, background 0.3s ease;
+        }
+        button:hover {
+            transform: scale(1.05);
+            background: #CCA300; /* Darker Gold */
+        }
+        #inputField {
+            padding: 15px;
+            font-size: 18px;
+            margin: 10px;
+            width: 250px;
+            border: 3px solid #6A7BA2; /* Slate Blue */
+            border-radius: 10px;
+            background: #FFFFFF;
+            color: #002D62;
+            transition: border-color 0.3s ease;
+        }
+        #inputField:focus {
+            border-color: #FFD700; /* Gold on focus */
+            outline: none;
+        }
+        #options {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        #result {
+            font-size: 22px;
+            color: #6B8E23; /* Leaf Green */
+            margin-top: 25px;
+            text-align: center;
+            padding: 20px;
+            background: rgba(107, 142, 35, 0.15);
+            border-radius: 10px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        #restart, #save {
+            background: #FFD700; /* Gold */
+            color: #002D62; /* Dark Blue */
+            margin-top: 20px;
+            padding: 15px 30px;
+        }
+        #restart:hover, #save:hover {
+            background: #CCA300; /* Darker Gold */
+            transform: scale(1.05);
+        }
+        .reasoning {
+            font-size: 16px;
+            color: #6A7BA2; /* Slate Blue */
+            margin-top: 15px;
+            text-align: center;
+            padding: 15px;
+            background: rgba(106, 123, 162, 0.15);
+            border-radius: 10px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .fact {
+            font-size: 16px;
+            color: #F5F5DC; /* Beige */
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2); /* Semi-transparent white */
+            border-radius: 10px;
+            border-left: 5px solid #6B8E23; /* Leaf Green accent */
+        }
+        .did-you-know {
+            font-size: 16px;
+            color: #F5F5DC; /* Beige */
+            text-align: center;
+            margin-top: 10px;
+            padding: 15px;
+            background: rgba(255, 215, 0, 0.2); /* Semi-transparent Gold */
+            border-radius: 10px;
+            border-left: 5px solid #6B8E23; /* Leaf Green accent */
+        }
+        .post-recommendation {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img id="logo" src="https://drive.google.com/uc?export=view&id=1zbLEPEeI_kyRERfq0YDmKO-sj3n1fwU1" alt="Massage Heights Canada Logo" onerror="this.onerror=null; this.src='https://via.placeholder.com/300x150?text=Logo+Not+Loaded'; this.alt='Placeholder Logo'; console.log('Logo load failed');">
+        <div id="logo-note">Note: If logo doesn't load, please update the src URL in the code with a direct link or ensure 'Anyone with the link can view' is enabled. Check console for errors.</div>
+        <input type="text" id="nameInput" placeholder="Enter your name">
+        <button id="submitName" onclick="startTree()">Submit</button>
+        <div id="question"></div>
+        <div id="fact" class="fact"></div>
+        <div id="did-you-know" class="did-you-know"></div>
+        <div id="options"></div>
+        <div id="result"></div>
+        <div id="post-recommendation" class="post-recommendation"></div>
+        <div id="reasoning" class="reasoning"></div>
+        <button id="restart" onclick="startTree()">Restart</button>
+        <button id="save" onclick="saveResult()">Save Result</button>
+    </div>
+
+    <script>
+        // Massage therapy facts for each page
+        const facts = [
+            "Regular massage therapy can reduce stress by lowering cortisol levels by up to 30%.",
+            "Massage improves circulation, delivering more oxygen and nutrients to muscles and tissues.",
+            "Studies show massage can alleviate chronic pain by 36% with consistent sessions.",
+            "Massage boosts immunity by increasing the activity of natural killer cells.",
+            "Regular sessions can enhance sleep quality by reducing insomnia symptoms by 25%.",
+            "Massage therapy can lower blood pressure, promoting better heart health."
+        ];
+
+        // Elevation descriptions for "Did You Know"
+        const elevationInfo = `
+            Did You Know? Elevations enhance your massage experience:
+            - Dynamic Cupping: Uses gentle suction and movement to release muscle tension and improve circulation.
+            - Hot Stone Therapy: Adds soothing warmth to relax muscles and boost blood flow.
+            - Revitalizing Face Massage: Targets jaw and forehead tension, promoting lymphatic drainage.
+            - Foot Scrub: Exfoliates and relieves fatigue for refreshed feet.
+            - Focused Neck Tension Treatment: Relieves stiffness in the neck and upper shoulders.
+            - Hot and Cold Stone Contrast Therapy: Alternates temperatures to stimulate circulation and reduce inflammation.
+        `;
+
+        // Define the decision tree structure
+        const tree = {
+            start: {
+                question: "What is your preferred massage duration?",
+                fact: facts[0],
+                options: [
+                    { text: "60 minutes", next: "frequency", action: () => { selectedDuration = 60; } },
+                    { text: "90 minutes", next: "frequency_90", action: () => { selectedDuration = 90; } }
+                ]
+            },
+            frequency: {
+                question: "How often do you plan to visit per month?",
+                fact: facts[1],
+                options: [
+                    { text: "1 time", next: "elevation_60", action: () => { selectedFrequency = 1; } },
+                    { text: "2+ times", next: "elevation_60_long", action: () => { selectedFrequency = 2; } }
+                ]
+            },
+            frequency_90: {
+                question: "How often do you plan to visit per month?",
+                fact: facts[2],
+                options: [
+                    { text: "1 time", next: "elevation_90", action: () => { selectedFrequency = 1; } },
+                    { text: "2+ times", next: "elevation_90_long", action: () => { selectedFrequency = 2; } }
+                ]
+            },
+            elevation_60: {
+                question: "Would you like to add an elevation?",
+                fact: facts[3],
+                didYouKnow: elevationInfo,
+                options: [
+                    { text: "No", next: "term", action: () => { selectedElevation = 'None'; selectedTier = 'Foundation'; } },
+                    { text: "Yes", next: "term", action: () => { selectedElevation = 'Included'; selectedTier = 'Heightened'; } }
+                ]
+            },
+            elevation_60_long: {
+                question: "Would you like to add an elevation?",
+                fact: facts[4],
+                didYouKnow: elevationInfo,
+                options: [
+                    { text: "No", next: "term_long", action: () => { selectedElevation = 'None'; selectedTier = 'Foundation'; } },
+                    { text: "Yes", next: "term_long", action: () => { selectedElevation = 'Included'; selectedTier = 'Heightened'; } }
+                ]
+            },
+            elevation_90: {
+                question: "Would you like to add an elevation?",
+                fact: facts[5],
+                didYouKnow: elevationInfo,
+                options: [
+                    { text: "No", next: "term", action: () => { selectedElevation = 'None'; selectedTier = 'Peak'; } },
+                    { text: "Yes", next: "term", action: () => { selectedElevation = 'Included'; selectedTier = 'Pinnacle'; } }
+                ]
+            },
+            elevation_90_long: {
+                question: "Would you like to add an elevation?",
+                fact: facts[0],
+                didYouKnow: elevationInfo,
+                options: [
+                    { text: "No", next: "term_long", action: () => { selectedElevation = 'None'; selectedTier = 'Peak'; } },
+                    { text: "Yes", next: "term_long", action: () => { selectedElevation = 'Included'; selectedTier = 'Pinnacle'; } }
+                ]
+            },
+            term: {
+                question: "Would you like to share a massage during your term?",
+                fact: facts[1],
+                options: [
+                    { text: "No", next: "health_has", action: () => { if (selectedFrequency === 2) selectedTerm = 12; else selectedTerm = 3; } },
+                    { text: "Yes", next: "health_has", action: () => { selectedTerm = 12; } }
+                ]
+            },
+            term_long: {
+                question: "Would you like to share a massage during your term? (Recommended: Yes for frequent visits)",
+                fact: facts[2],
+                options: [
+                    { text: "No", next: "health_has", action: () => { if (selectedFrequency === 2) selectedTerm = 12; else selectedTerm = 3; } },
+                    { text: "Yes", next: "health_has", action: () => { selectedTerm = 12; } }
+                ]
+            },
+            health_has: {
+                question: "Do you have health benefits?",
+                fact: facts[3],
+                options: [
+                    { text: "Yes", next: "health_amount", action: () => { healthHas = true; } },
+                    { text: "No", next: "payment", action: () => { healthHas = false; } }
+                ]
+            },
+            health_amount: {
+                question: "How much is your health benefits allowance?",
+                fact: facts[4],
+                options: [
+                    { text: "$500", action: () => { healthAmount = 500; }, next: "health_reset" },
+                    { text: "$750", action: () => { healthAmount = 750; }, next: "health_reset" },
+                    { text: "$1000", action: () => { healthAmount = 1000; }, next: "health_reset" },
+                    { text: "Other", next: "health_amount_custom", action: () => {} }
+                ]
+            },
+            health_amount_custom: {
+                question: "Enter your custom health benefits amount",
+                fact: facts[5],
+                type: "input",
+                inputType: "number",
+                var: "healthAmount",
+                next: "health_reset"
+            },
+            health_reset: {
+                question: "When do your benefits reset?",
+                fact: facts[0],
+                options: [
+                    { text: "January 2026", action: () => { healthReset = '2026-01-01'; }, next: "payment" },
+                    { text: "July 2026", action: () => { healthReset = '2026-07-01'; }, next: "payment" },
+                    { text: "Custom", next: "health_reset_custom", action: () => {} }
+                ]
+            },
+            health_reset_custom: {
+                question: "Enter custom reset month and year (MM-YYYY)",
+                fact: facts[1],
+                type: "input",
+                inputType: "text",
+                var: "healthResetCustom",
+                next: "payment",
+                action: () => {
+                    const [month, year] = document.getElementById('inputField').value.split('-');
+                    healthReset = `${year}-${month.padStart(2, '0')}-01`;
+                }
+            },
+            payment: {
+                question: "Are you interested in paying upfront for discounts?",
+                fact: facts[2],
+                options: [
+                    { text: "Yes", action: () => { isUpfront = true; currentResult = calculateResult(); showResult(currentResult, "Based on your selections and calculated costs."); showPostRecommendation(); }, next: null },
+                    { text: "No", action: () => { isUpfront = false; currentResult = calculateResult(); showResult(currentResult, "Based on your selections and calculated costs."); showPostRecommendation(); }, next: null }
+                ]
+            }
+        };
+
+        let selectedDuration = 0;
+        let selectedFrequency = 0;
+        let selectedTier = '';
+        let selectedTerm = 0;
+        let selectedElevation = '';
+        let isUpfront = false;
+        let healthHas = false;
+        let healthAmount = 0;
+        let healthReset = '';
+        let answers = [];
+        let currentResult = '';
+        let guestName = '';
+
+        // Define elevation credits included per tier
+        const elevationIncluded = {
+            'Foundation': 0,
+            'Heightened': 1,
+            'Peak': 0,
+            'Pinnacle': 1
+        };
+
+        const monthlyDues = {
+            'Foundation': 99.99,
+            'Heightened': 109.99,
+            'Peak': 149.99,
+            'Pinnacle': 159.99
+        };
+
+        const numCredits = {
+            'Foundation': 2,
+            'Heightened': 2,
+            'Peak': 3,
+            'Pinnacle': 3
+        };
+
+        const upfrontPrice = {
+            'Foundation': { 3: 299.97, 6: 599.95, 12: 1199.89 },
+            'Heightened': { 6: 659.95, 12: 1319.89 },
+            'Peak': { 6: 899.95, 12: 1799.89 },
+            'Pinnacle': { 6: 959.95, 12: 1919.89 }
+        };
+
+        const cancellationTime = {
+            3: '1 month',
+            6: '3 months',
+            12: '6 months'
+        };
+
+        function getLowerTier(tier) {
+            if (tier === 'Pinnacle') return 'Peak';
+            if (tier === 'Peak') return 'Heightened';
+            if (tier === 'Heightened') return 'Foundation';
+            return 'Foundation';
+        }
+
+        function getMonthly() {
+            let base = monthlyDues[selectedTier] || 0; // Default to 0 if undefined
+            if (selectedTerm === 3) {
+                base += 10; // $10 more for 3-month terms per 60 minutes
+            }
+            return base;
+        }
+
+        function isUpfrontAvailable() {
+            return selectedTier && selectedTerm && upfrontPrice[selectedTier] && upfrontPrice[selectedTier][selectedTerm] !== undefined;
+        }
+
+        function getDescription() {
+            let desc = (selectedTier || 'Unknown') + ' Membership (' + (selectedTerm || 0) + ' Months';
+            if (isUpfront) desc += ', Upfront)';
+            else desc += ')';
+            desc += ': ' + (numCredits[selectedTier] || 0) + ', 30-minute credits/month ($' + getMonthly().toFixed(2) + ' + tax)';
+            if (elevationIncluded[selectedTier] > 0 && selectedElevation === 'Included') desc += ' with 1 elevation credit/month (additional $10 for extras)';
+            if (elevationIncluded[selectedTier] > 0 && selectedElevation === 'None') desc += ' plus ' + elevationIncluded[selectedTier] + ' elevation credit/month (additional $10)';
+            desc += ', free aromatherapy, auto-renews.';
+            if (selectedTerm === 12) desc += ' Benefits: Share up to 4 credits/year, freeze up to 3 months/year, $5 off additional 30-minute massages, 25% off retail.';
+            if (isUpfront) {
+                desc += ' All ' + ((numCredits[selectedTier] || 0) * (selectedTerm || 0)) + ' credits upfront, ' + (selectedTerm === 12 ? '18' : '12') + ' months to use';
+                if (selectedTerm === 12) desc += ', 1 free ' + (selectedDuration || 60) + '-minute massage' + (elevationIncluded[selectedTier] > 0 && selectedElevation === 'Included' ? ' with elevation' : '') + ', share up to 3, ' + (selectedDuration || 60) + '-minute massages/year, 25% off retail';
+            }
+            return desc;
+        }
+
+        function calculateEffectiveBenefits() {
+            if (!healthHas) return 0;
+            const currentDate = new Date('2025-08-18');
+            let resetDate = new Date(healthReset);
+            if (isNaN(resetDate.getTime())) return 0; // Invalid date
+            if (resetDate < currentDate) resetDate.setFullYear(currentDate.getFullYear() + 1);
+            const endDate = new Date(currentDate);
+            endDate.setMonth(endDate.getMonth() + (selectedTerm || 0));
+            let periods = 1;
+            if (resetDate > currentDate && resetDate < endDate) periods = 2;
+            return (healthAmount || 0) * periods;
+        }
+
+        function calculateResult() {
+            let total = 0;
+            if (isUpfront) {
+                if (isUpfrontAvailable()) {
+                    total = upfrontPrice[selectedTier][selectedTerm] || 0;
+                } else {
+                    isUpfront = false; // Fallback
+                    total = getMonthly() * (selectedTerm || 0);
+                }
+            } else {
+                total = getMonthly() * (selectedTerm || 0);
+            }
+            const effectiveBenefits = calculateEffectiveBenefits();
+            const outOfPocket = Math.max(0, total - effectiveBenefits);
+            const perMonth = total > 0 ? outOfPocket / (selectedTerm || 1) : 0; // Avoid division by zero
+            const monthsCovered = Math.floor(effectiveBenefits / getMonthly());
+            const sessionCost = getMonthly() > 0 ? getMonthly() / (numCredits[selectedTier] / (selectedDuration / 60)) : 0; // Avoid division by zero
+            const numMassages = sessionCost > 0 ? Math.floor(effectiveBenefits / sessionCost) : 0;
+            const leftOver = cancellationTime[selectedTerm] || '0 months';
+            let message = getDescription() + '\nTotal Investment: $' + (total || 0).toFixed(2) + ' + tax\nEffective Benefits: $' + (effectiveBenefits || 0).toFixed(2) + '\nOut of Pocket: $' + (outOfPocket || 0).toFixed(2) + ' + tax\nPer Month: $' + (perMonth || 0).toFixed(2) + ' + tax';
+            message += '\nMonths Fully Covered by Benefits: ' + (monthsCovered || 0);
+            message += '\nNumber of ' + (selectedDuration || 60) + '-Minute Massages Covered by Benefits: ' + (numMassages || 0);
+            message += '\nIf Cancelled: ' + leftOver + ' to use remaining credits';
+            return message;
+        }
+
+        function showQuestion(node) {
+            const current = tree[node];
+            if (!current) {
+                console.error("Node not found:", node);
+                return;
+            }
+            document.getElementById('question').innerText = current.question || '';
+            document.getElementById('fact').innerText = current.fact || '';
+            document.getElementById('did-you-know').innerText = current.didYouKnow || '';
+            const optionsDiv = document.getElementById('options');
+            optionsDiv.innerHTML = '';
+            if (current.type === 'input') {
+                const input = document.createElement('input');
+                input.id = 'inputField';
+                input.type = current.inputType || 'text';
+                input.placeholder = 'Enter here';
+                optionsDiv.appendChild(input);
+                const submitBtn = document.createElement('button');
+                submitBtn.innerText = 'Submit';
+                submitBtn.onclick = () => {
+                    const value = input.value;
+                    if (current.var === 'healthAmount') healthAmount = parseFloat(value) || 0;
+                    if (current.var === 'healthResetCustom') {
+                        const [month, year] = value.split('-');
+                        healthReset = `${year}-${month.padStart(2, '0')}-01`;
+                    }
+                    if (current.next) showQuestion(current.next);
+                };
+                optionsDiv.appendChild(submitBtn);
+                optionsDiv.className = 'input-group';
+            } else {
+                current.options.forEach(option => {
+                    const btn = document.createElement('button');
+                    btn.innerText = option.text;
+                    btn.onclick = () => {
+                        answers.push({ question: current.question, answer: option.text });
+                        if (option.action) option.action();
+                        if (option.next) {
+                            showQuestion(option.next);
+                        }
+                    };
+                    optionsDiv.appendChild(btn);
+                });
+            }
+            document.getElementById('result').innerText = '';
+            document.getElementById('reasoning').innerText = '';
+            document.getElementById('post-recommendation').innerHTML = '';
+            document.getElementById('restart').style.display = 'none';
+            document.getElementById('save').style.display = 'none';
+            optionsDiv.style.display = 'flex';
+        }
+
+        function showResult(message, reasoning) {
+            guestName = document.getElementById('nameInput').value || 'Guest';
+            document.getElementById('question').innerText = '';
+            document.getElementById('options').style.display = 'none';
+            document.getElementById('fact').innerText = '';
+            document.getElementById('did-you-know').innerText = '';
+            document.getElementById('result').innerText = `🎉 Congratulations, ${guestName}! 🎉\nRecommended: ${message}`;
+            document.getElementById('reasoning').innerText = `Reasoning: ${reasoning}`;
+            showPostRecommendation();
+            document.getElementById('restart').style.display = 'inline-block';
+            document.getElementById('save').style.display = 'inline-block';
+        }
+
+        function showPostRecommendation() {
+            const postRecDiv = document.getElementById('post-recommendation');
+            postRecDiv.innerHTML = '';
+            const pkgBtn = document.createElement('button');
+            pkgBtn.innerText = 'Would you like to see the benefits of purchasing as a package?';
+            pkgBtn.onclick = () => {
+                showQuestion('post_recommendation_1');
+            };
+            postRecDiv.appendChild(pkgBtn);
+            const adjustBtn = document.createElement('button');
+            adjustBtn.innerText = 'If this doesn\'t work for you, is it the commitment, the cost, or the service recommended?';
+            adjustBtn.onclick = () => {
+                showQuestion('post_recommendation_2');
+            };
+            postRecDiv.appendChild(adjustBtn);
+        }
+
+        function saveResult() {
+            if (currentResult && answers.length > 0) {
+                const data = {
+                    name: guestName,
+                    recommendation: currentResult,
+                    answers: answers,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem('membershipRecommendation', JSON.stringify(data));
+                alert('Your recommendation and answers have been saved!');
+            }
+        }
+
+        function startTree() {
+            answers = [];
+            currentResult = '';
+            selectedDuration = 0;
+            selectedFrequency = 0;
+            selectedTier = '';
+            selectedTerm = 0;
+            selectedElevation = '';
+            isUpfront = false;
+            healthHas = false;
+            healthAmount = 0;
+            healthReset = '';
+            guestName = document.getElementById('nameInput').value || 'Guest';
+            showQuestion('start');
+        }
+
+        // Start the tree on load or Enter key in name input
+        document.getElementById('nameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') startTree();
+        });
+        if (document.getElementById('nameInput').value) startTree();
+    </script>
+</body>
+</html>
+</xaiArtifact>
